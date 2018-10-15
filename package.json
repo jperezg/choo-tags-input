@@ -1,6 +1,6 @@
 {
   "name": "choo-tags-input",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "choo": "^6.13.0",
-    "sheetify": "^7.3.3"
+    "choo": "^6.13.0"
   }
 }

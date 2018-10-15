@@ -1,9 +1,8 @@
 const html = require('choo/html')
-const css = require('sheetify')
 
 module.exports = TagsInputComponent
 
-function TagsInputComponent(settings, elementCss) {
+function TagsInputComponent(settings, elementClass) {
   let options = Object.assign({
     type: 'text',
     id: 'tagInput',
@@ -41,40 +40,11 @@ function TagsInputComponent(settings, elementCss) {
   }
 
   return html`
-    <div class="form-control ${elementCss || controlCss}" onclick="${focusInput}">
-      ${ options.tags.map((tag, index) => html`<span class="${badgeCss} badge badge-pill badge-info mr-2">${tag}<a href="#" onclick=${onRemoveTag(index)}>x</a></span>`) }
-      <span class="${editableCss}" contenteditable="true" id="editable-${options.name}" onkeydown=${onKeyPress}></span>
+    <div class="form-control ${elementClass || ''}" onclick="${focusInput}">
+      ${ options.tags.map((tag, index) => html`<span class="tag badge badge-pill badge-info mr-2">${tag}<a href="#" onclick=${onRemoveTag(index)}>x</a></span>`) }
+      <span class="editable-element" contenteditable="true" id="editable-${options.name}" onkeydown=${onKeyPress}></span>
       <input type="hidden" id="${options.id}" name="${options.name}" value="${ options.tags.join(',') }" />
     </div>
   `
 }
-
-const controlCss = css`:host {
-  overflow: auto;
-}`
-
-const editableCss = css`
-:host {
-  display: inline-block;
-  max-width: 100px;
-}
-`
-
-const badgeCss = css`
-:host {
-  font-size: 1rem;
-  line-height: 1.2;
-  font-weight: normal;
-}
-:host a {
-  color: #00a2b9;
-  background: white;
-  border-radius: 22px;
-  width: 18px;
-  height: 18px;
-  display: inline-block;
-  margin-left: 5px;
-  line-height: 1;
-}
-`
 
