@@ -40,7 +40,7 @@ function TagsInputComponent(settings, elementClass) {
   }
 
   return html`
-    <div class="form-control ${elementClass || ''}" onclick="${focusInput}">
+    <div class="form-control ${elementClass || ''}" onclick="${focusInput}" style="overflow: auto;">
       ${ options.tags.map((tag, index) => html`<span class="tag badge badge-pill badge-info mr-2">${tag}<a href="#" onclick=${onRemoveTag(index)}>x</a></span>`) }
       <span class="editable-element" contenteditable="true" id="editable-${options.name}" onkeydown=${onKeyPress}></span>
       <input type="hidden" id="${options.id}" name="${options.name}" value="${ options.tags.join(',') }" />
