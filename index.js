@@ -1,56 +1,88 @@
 const html = require('choo/html')
+const Component = require('choo/component')
 
-module.exports = TagsInputComponent
+module.exports = class TagsInputComponent extends Component {
 
-function TagsInputComponent(settings, elementClass) {
-  let options = Object.assign({
-    type: 'text',
-    id: 'tagInput',
-    name: '',
-    value: '',
-    tags: []
-  }, settings)
+  constructor (id = 'tagInput', name, onChange) {
+    super(id)
 
-  const onKeyPress = function(event) {
+    this.id = id
+    this.name = name
+    this.tags = []
+    this.onChange = onChange
+    this.onKeyPress = this.onKeyPress.bind(this)
+    this.addTag = this.addTag.bind(this)
+    this.removeTag = this.removeTag.bind(this)
+    this.focusInput = this.focusInput.bind(this)
+    this.showTag = this.showTag.bind(this)
+  }
+
+  onKeyPress (event) {
     if (['Comma', 'Enter', 'Tab'].indexOf(event.code) != -1 && event.currentTarget.innerText.trim()) {
       event.preventDefault()
-      options.tags.push(event.currentTarget.innerText)
-      options.onChange && options.onChange(options.name, options.tags)
+      this.addTag(event)
     } else if (event.code == 'Enter') {
       event.preventDefault()
     }
   }
 
-  const onRemoveTag = function(index) {
-    return function(event) {
+  addTag(event) {
+    if (event.currentTarget.innerText.trim()) {
+      this.onChange && this.onChange(this.name, this.tags.concat(event.currentTarget.innerText))
+    }
+  }
+
+  removeTag (index) {
+    return (event) => {
       event.preventDefault()
-      removeTag(index)
+
+      if (this.tags.length && index >= 0) {
+        const newTags = this.tags.filter((tag, i) => i != index)
+        this.onChange && this.onChange(this.name, newTags)
+      }
     }
   }
 
-  const removeTag = function(index) {
-    if (options.tags.length && index >= 0) {
-      options.tags.splice(index, 1)
-      options.onChange && options.onChange(options.name, options.tags)
-    }
+  focusInput () {
+    document.getElementById('editable-' + this.name).focus()
   }
 
-  const focusInput = function() {
-    document.getElementById('editable-' + options.name).focus()
+  showTag (tag, index) {
+    return html`<span style="display: inline;" class="tag badge badge-pill badge-info mr-2" id="tag-${index}-${this.id}">
+      ${tag}
+      <a href="#" onclick=${this.removeTag(index)}>x</a>
+    </span>`
   }
 
-  const showTag = function(tag, index) {
-    return html`<span style="display: inline;" class="tag badge badge-pill badge-info mr-2">${tag}<a href="#" onclick=${onRemoveTag(index)}>x</a></span>`
-  }
+  createElement (tags) {
+    this.tags = tags
 
-  return html`
-    <div class="form-control ${elementClass || ''}" onclick="${focusInput}" style="overflow-x: auto; overflow-y: hidden; position: relative;">
-      <div style="position: absolute;">
-        ${ options.tags.map(showTag) }
-        <span class="editable-element" contenteditable="true" id="editable-${options.name}" onkeydown=${onKeyPress}></span>
+    return html`
+      <div
+        class="form-control"
+        style="overflow-x: auto; overflow-y: hidden; position: relative;"
+        id="${this.id}"
+        onclick="${this.focusInput}">
+        <div style="position: absolute;">
+          ${ this.tags.map(this.showTag) }
+          <span
+            class="editable-element"
+            style="display: inline-block;"
+            contenteditable="true"
+            id="editable-${this.name}"
+            onkeydown=${this.onKeyPress} onblur=${this.addTag}>
+          </span>
+        </div>
+        <input type="hidden" id="${this.id}" name="${this.name}" value="${ this.tags.join(',') }" />
       </div>
-      <input type="hidden" id="${options.id}" name="${options.name}" value="${ options.tags.join(',') }" />
-    </div>
-  `
-}
+    `
+  }
 
+  afterupdate (element) {
+    element.scrollBy({top: 0, left: element.scrollWidth, behavior: 'smooth'})
+  }
+
+  update (tags) {
+    return tags.length != this.tags.length
+  }
+}
