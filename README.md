@@ -14,19 +14,14 @@ const TagsInputComponent = require('choo-tags-input')
 
 module.exports = FormComponent
 
-function FormComponent(state, emit) {
-  const tagInput = TagsInputComponent({
-    name: 'customInputName',
-    id: 'customInputId',
-    onChange: onTagsChange(emit),
-    tags: state.tags
-  }, 'classCss')
+const tagInput = TagsInputComponent('customInputId', 'customInputName', onTagsChange(emit))
 
+function FormComponent(state, emit) {
   return html`
     <form>
       <div class="form-group">
         <label for="customInputId">Input label</label>
-        ${ tagInput }
+        ${ tagInput.render(state.tags) }
       </div>
     </form>
   `
